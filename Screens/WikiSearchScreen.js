@@ -1,16 +1,51 @@
 import React, { Component } from "react";
-import { View, Text, StyleSheet, Button } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Button,
+  TextInput,
+  TouchableWithoutFeedback,
+  Keyboard,
+  Alert,
+} from "react-native";
 
 class WikiSearchScreen extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      keyword: "",
+      summary: "",
+    };
+  }
+
+  keywordHandler = (word) => {
+    this.setState({
+      keyword: word,
+    });
+  };
+
+  searchHandler = () => {
+    if (this.state.keyword === "") {
+      Alert.alert("Enter Keyword!");
+    } else {
+      this.props.navigation.navigate("Summary", {
+        summary: this.state.keyword,
+      });
+    }
+  };
+
   render() {
     return (
-      <View style={styles.screen}>
-        <Text>WikiSearchScreen</Text>
-        <Button
-          title="Search"
-          onPress={() => this.props.navigation.navigate("Summary")}
-        />
-      </View>
+      <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+        <View style={styles.screen}>
+          <TextInput
+            placeholder="Enter Keyword.."
+            onChangeText={(text) => this.keywordHandler(text)}
+          />
+          <Button title="Search" onPress={this.searchHandler} />
+        </View>
+      </TouchableWithoutFeedback>
     );
   }
 }

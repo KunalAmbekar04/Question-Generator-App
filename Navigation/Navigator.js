@@ -17,8 +17,16 @@ const MainStackNavigator = () => {
           component={CategoriesScreen}
           options={{ headerShown: false }}
         />
-        <Stack.Screen name="WikiSearch" component={WikiSearchScreen} />
-        <Stack.Screen name="Summary" component={SummaryScreen} />
+        <Stack.Screen
+          name="WikiSearch"
+          component={WikiSearchScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Summary"
+          component={SummaryScreen}
+          options={{ headerShown: false }}
+        />
         <Stack.Screen name="QuestionList" component={QuestionListScreen} />
       </Stack.Navigator>
     </NavigationContainer>
