@@ -1,29 +1,44 @@
 import React, { Component } from "react";
+import { StyleSheet, Dimensions } from "react-native";
+import { API_URL } from "../Utils";
 import {
-  View,
+  Container,
+  Header,
+  Content,
+  Card,
+  CardItem,
   Text,
-  StyleSheet,
+  Body,
   Button,
-  Keyboard,
-  TouchableWithoutFeedback,
-} from "react-native";
-import { TextInput } from "react-native-gesture-handler";
+  Icon,
+} from "native-base";
+
+const { width, height } = Dimensions.get("window");
 
 class SummaryScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
       summary: "",
+      keyword: "",
     };
   }
 
   componentDidMount() {
     if (this.props.route.params) {
-      const summary = this.props.route.params.summary;
-      console.log("SUMMARY: ", summary);
-      this.setState({
-        summary: summary,
-      });
+      const keyword = this.props.route.params.keyword;
+
+      fetch(`${API_URL}summary?keyword=${keyword}`)
+        .then((resp) => resp.json())
+        .then((data) => {
+          this.setState({
+            summary: data["summary"],
+            keyword: keyword,
+          });
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     }
   }
 
@@ -34,24 +49,55 @@ class SummaryScreen extends Component {
   };
 
   generateQuestionHandler = () => {
-    this.props.navigation.navigate("QuestionList");
+    console.log("clicked");
+    const data = {
+      context: this.state.summary,
+    };
+    fetch(`${API_URL}generate`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    })
+      .then((resp) => {
+        return resp.json();
+      })
+      .then((list) => {
+        let questions = [];
+
+        for (let key in list["questions"]) {
+          questions.push({ question: list["questions"][key], id: key });
+        }
+        this.props.navigation.navigate("QuestionList", {
+          questions: questions,
+        });
+      });
   };
 
   render() {
     return (
-      <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-        <View style={styles.screen}>
-          <TextInput
-            value={this.state.summary}
-            placeholder="Enter content here.."
-            onChangeText={(text) => this.summaryHandler(text)}
-          />
-          <Button
-            title="Generate Question"
-            onPress={this.generateQuestionHandler}
-          />
-        </View>
-      </TouchableWithoutFeedback>
+      <Container>
+        <Header />
+        <Content padder>
+          <Card>
+            <CardItem header bordered>
+              <Text>{this.state.keyword}</Text>
+            </CardItem>
+            <CardItem>
+              <Body>
+                <Text>{this.state.summary}</Text>
+              </Body>
+            </CardItem>
+            <CardItem footer bordered>
+              <Button iconRight success onPress={this.generateQuestionHandler}>
+                <Text>Generate Questions</Text>
+                <Icon name="arrow-forward" />
+              </Button>
+            </CardItem>
+          </Card>
+        </Content>
+      </Container>
     );
   }
 }
@@ -59,8 +105,20 @@ class SummaryScreen extends Component {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    justifyContent: "center",
     alignItems: "center",
+    paddingTop: height * 0.1,
+  },
+  textAreaContainer: {
+    height: height * 0.75,
+    borderColor: "gray",
+    borderWidth: 1,
+    padding: 5,
+    marginBottom: height * 0.05,
+    borderRadius: 8,
+  },
+  textArea: {
+    justifyContent: "flex-start",
+    width: width * 0.9,
   },
 });
 
