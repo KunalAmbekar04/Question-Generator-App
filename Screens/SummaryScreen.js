@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { StyleSheet, Dimensions } from "react-native";
+import { StyleSheet, Dimensions, Alert } from "react-native";
 import { API_URL } from "../Utils";
 import {
   Container,
@@ -12,6 +12,8 @@ import {
   Button,
   Icon,
 } from "native-base";
+import { TextInput } from "react-native-gesture-handler";
+import AwesomeAlert from "react-native-awesome-alerts";
 
 const { width, height } = Dimensions.get("window");
 
@@ -21,6 +23,11 @@ class SummaryScreen extends Component {
     this.state = {
       summary: "",
       keyword: "",
+      question: "",
+      answer: "",
+      isLoading: true,
+      showAlert: false,
+      title: "Answer",
     };
   }
 
@@ -75,6 +82,59 @@ class SummaryScreen extends Component {
       });
   };
 
+  askQuestionHandler = () => {
+    this.setState(
+      {
+        showAlert: true,
+        isLoading: true,
+        title: "Loading",
+      },
+      () => {
+        const data = {
+          context: this.state.summary,
+          question: this.state.question,
+        };
+        if (this.state.question === "") {
+          this.setState({
+            isLoading: false,
+            title: "Error",
+            answer: "Please Enter the Question.",
+          });
+        } else {
+          fetch(`${API_URL}get_ans`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+          })
+            .then((resp) => resp.json())
+            .then((res) => {
+              console.log(res);
+              this.setState({
+                title: "Answer",
+                answer: res.answer,
+                isLoading: false,
+              });
+            });
+        }
+      }
+    );
+  };
+
+  switchAlertOn = () => {
+    this.setState({
+      showAlert: true,
+    });
+  };
+
+  switchAlertOff = () => {
+    this.setState({
+      showAlert: false,
+      answer: "",
+    });
+  };
+
   render() {
     return (
       <Container>
@@ -82,11 +142,20 @@ class SummaryScreen extends Component {
         <Content padder>
           <Card>
             <CardItem header bordered>
-              <Text>{this.state.keyword}</Text>
+              <Text>
+                {this.state.keyword ? this.state.keyword : "Your Content"}
+              </Text>
             </CardItem>
             <CardItem>
               <Body>
-                <Text>{this.state.summary}</Text>
+                <TextInput
+                  {...this.props}
+                  onChangeText={(text) => this.setState({ summary: text })}
+                  multiline={true}
+                  placeholder="Start typing.."
+                >
+                  {this.state.summary}
+                </TextInput>
               </Body>
             </CardItem>
             <CardItem footer bordered>
@@ -94,6 +163,40 @@ class SummaryScreen extends Component {
                 <Text>Generate Questions</Text>
                 <Icon name="arrow-forward" />
               </Button>
+            </CardItem>
+          </Card>
+          <Card>
+            <CardItem header bordered>
+              <Text>Your Question</Text>
+            </CardItem>
+            <CardItem>
+              <Body>
+                <TextInput
+                  {...this.props}
+                  onChangeText={(text) => this.setState({ question: text })}
+                  multiline={true}
+                  placeholder="Start typing.."
+                >
+                  {this.state.question}
+                </TextInput>
+              </Body>
+            </CardItem>
+            <CardItem footer bordered>
+              <Button iconRight success onPress={this.askQuestionHandler}>
+                <Text>Ask a Question</Text>
+                <Icon name="arrow-forward" />
+              </Button>
+              <AwesomeAlert
+                show={this.state.showAlert}
+                showProgress={this.state.isLoading}
+                title={this.state.title}
+                message={this.state.answer}
+                closeOnTouchOutside={true}
+                closeOnHardwareBackPress={true}
+                showCancelButton={true}
+                cancelButtonColor="#DD6B55"
+                onCancelPressed={this.switchAlertOff}
+              />
             </CardItem>
           </Card>
         </Content>
