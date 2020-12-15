@@ -1,19 +1,10 @@
 import React, { Component } from "react";
 import { View, StyleSheet, Dimensions } from "react-native";
-import { FlatList } from "react-native-gesture-handler";
-import {
-  Container,
-  Content,
-  List,
-  ListItem,
-  Text,
-  Left,
-  Right,
-  Icon,
-} from "native-base";
+import { FlatList, TouchableOpacity } from "react-native-gesture-handler";
+import { Container, Content, Text, Icon, Accordion } from "native-base";
+import { API_URL } from "../Utils";
 
 const { width, height } = Dimensions.get("window");
-
 const Item = ({ item }) => (
   <View style={styles.item}>
     <Text style={styles.title}>{item.question}</Text>
@@ -25,6 +16,7 @@ class QuestionListScreen extends Component {
     super(props);
     this.state = {
       questions: [],
+      context: "",
     };
   }
   renderItem = ({ item }) => {
@@ -34,33 +26,98 @@ class QuestionListScreen extends Component {
   componentDidMount() {
     this.setState({
       questions: this.props.route.params.questions,
+      context: this.props.route.params.context,
     });
+  }
+
+  _renderHeader(item, expanded, index, that) {
+    return (
+      <TouchableOpacity
+        style={{
+          flexDirection: "row",
+          padding: 10,
+          justifyContent: "space-between",
+          alignItems: "center",
+          width: width * 0.95,
+          backgroundColor: "#FFF",
+          borderBottomColor: "#dadada",
+          borderBottomWidth: 1,
+          paddingBottom: 15,
+        }}
+        activeOpacity={0.7}
+        onPress={() => {
+          const data = {
+            context: that.state.context,
+            question: item.title,
+          };
+          if (item.content === "") {
+            fetch(`${API_URL}get_ans`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(data),
+            })
+              .then((resp) => resp.json())
+              .then((data) => {
+                const questions_temp = [...that.state.questions];
+                const new_data = {
+                  title: item.title,
+                  content: data["answer"],
+                };
+
+                questions_temp[index] = new_data;
+                this.setState({
+                  questions: questions_temp,
+                });
+              })
+              .catch((err) => {
+                console.log(err);
+              });
+          }
+        }}
+      >
+        <Text style={{ fontWeight: "600", width: width * 0.7 }}>
+          {item.title}
+        </Text>
+        {expanded ? (
+          <Icon style={{ fontSize: 18 }} name="ios-arrow-dropup" />
+        ) : (
+          <Icon style={{ fontSize: 18 }} name="ios-arrow-dropdown" />
+        )}
+      </TouchableOpacity>
+    );
+  }
+  _renderContent(item) {
+    return (
+      <Text
+        style={{
+          backgroundColor: "#DCDCDC",
+          padding: 10,
+          fontStyle: "italic",
+        }}
+      >
+        {item.content}
+      </Text>
+    );
   }
   render() {
     return (
       <View style={styles.screen}>
         <Container>
-          {/* <FlatList
-          data={this.props.Data}
-          renderItem={this.renderItem}
-          keyExtractor={(item) => item.id}
-        /> */}
-          <Content>
-            <List
-              style={{
-                width: width,
-              }}
-            >
-              {this.state.questions.map((item, id) => {
-                return (
-                  <ListItem key={id}>
-                    <Left>
-                      <Text>{item.question}</Text>
-                    </Left>
-                  </ListItem>
-                );
-              })}
-            </List>
+          <Content padder>
+            <Accordion
+              dataArray={this.state.questions}
+              icon="add"
+              expandedIcon="remove"
+              style={styles.item}
+              animation={true}
+              expanded={true}
+              renderHeader={(item, expanded, index) =>
+                this._renderHeader(item, expanded, index, this)
+              }
+              renderContent={this._renderContent}
+            />
           </Content>
         </Container>
       </View>
@@ -75,11 +132,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   item: {
-    backgroundColor: "#f9c2ff",
-    padding: 20,
-    borderRadius: 8,
-    width: width * 0.9,
-    marginTop: 15,
+    // backgroundColor: "#f9c2ff",
+    // padding: 20,
+    width: width * 0.95,
   },
   title: {
     fontSize: 14,

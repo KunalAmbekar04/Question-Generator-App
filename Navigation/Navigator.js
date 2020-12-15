@@ -12,11 +12,7 @@ const MainStackNavigator = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Categories">
-        <Stack.Screen
-          name="Categories"
-          component={CategoriesScreen}
-          options={{ headerShown: false }}
-        />
+        <Stack.Screen name="Categories" component={CategoriesScreen} />
         <Stack.Screen
           name="WikiSearch"
           component={WikiSearchScreen}
@@ -25,7 +21,7 @@ const MainStackNavigator = () => {
         <Stack.Screen
           name="Summary"
           component={SummaryScreen}
-          options={{ headerShown: false }}
+          // options={{ headerShown: true }}
         />
         <Stack.Screen name="QuestionList" component={QuestionListScreen} />
       </Stack.Navigator>

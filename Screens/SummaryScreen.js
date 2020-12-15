@@ -53,6 +53,9 @@ class SummaryScreen extends Component {
     const data = {
       context: this.state.summary,
     };
+    // this.props.navigation.navigate("QuestionList", {
+    //   questions: [],
+    // });
     fetch(`${API_URL}generate`, {
       method: "POST",
       headers: {
@@ -67,10 +70,15 @@ class SummaryScreen extends Component {
         let questions = [];
 
         for (let key in list["questions"]) {
-          questions.push({ question: list["questions"][key], id: key });
+          questions.push({
+            title: list["questions"][key],
+            id: key,
+            content: "",
+          });
         }
         this.props.navigation.navigate("QuestionList", {
           questions: questions,
+          context: this.state.summary,
         });
       });
   };
@@ -78,7 +86,6 @@ class SummaryScreen extends Component {
   render() {
     return (
       <Container>
-        <Header />
         <Content padder>
           <Card>
             <CardItem header bordered>

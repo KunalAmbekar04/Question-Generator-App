@@ -1,6 +1,8 @@
+import { Icon } from "native-base";
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import { LinearGradient } from "expo-linear-gradient";
 
 const Card = (props) => {
   return (
@@ -8,11 +10,21 @@ const Card = (props) => {
       <TouchableOpacity
         style={{
           ...styles.card,
-          backgroundColor: props.backgroundColor,
         }}
         onPress={props.toScreen}
       >
-        <Text style={styles.cardTitle}>{props.title}</Text>
+        <LinearGradient
+          colors={["#4c669f", "#3b5998", "#192f6a"]}
+          style={{
+            position: "absolute",
+            left: 0,
+            right: 0,
+            top: 0,
+            height: "100%",
+          }}
+        />
+        <Icon name={props.iconName} style={{ fontSize: 70, color: "white" }} />
+        <Text style={{ ...styles.cardTitle }}>{props.title}</Text>
       </TouchableOpacity>
     </View>
   );
@@ -29,11 +41,13 @@ const styles = StyleSheet.create({
     height: 250,
     width: "100%",
     borderRadius: 20,
+    overflow: "hidden",
   },
   cardTitle: {
-    fontSize: 20,
+    fontSize: 30,
     padding: 20,
     fontWeight: "bold",
+    color: "white",
   },
 });
 

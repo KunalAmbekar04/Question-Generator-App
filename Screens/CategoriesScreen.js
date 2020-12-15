@@ -9,11 +9,15 @@ class CategoriesScreen extends Component {
         <Card
           title="Wiki Search"
           backgroundColor="#9eecff"
+          iconName="search"
+          textColor="white"
           toScreen={() => this.props.navigation.navigate("WikiSearch")}
         />
         <Card
           title="User Input"
           backgroundColor="#ffc7ff"
+          iconName="ios-man"
+          textColor="white"
           toScreen={() => this.props.navigation.navigate("Summary")}
         />
       </View>

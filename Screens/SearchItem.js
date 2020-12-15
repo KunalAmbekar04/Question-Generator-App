@@ -10,6 +10,7 @@ import {
   Left,
   Right,
   Icon,
+  Header,
 } from "native-base";
 
 const { width, height } = Dimensions.get("window");
@@ -44,6 +45,7 @@ class SearchItem extends Component {
           renderItem={this.renderItem}
           keyExtractor={(item) => item.id}
         /> */}
+
         <Content>
           <List
             style={{
