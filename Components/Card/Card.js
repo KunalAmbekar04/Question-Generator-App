@@ -14,7 +14,9 @@ const Card = (props) => {
         onPress={props.toScreen}
       >
         <LinearGradient
-          colors={["#4c669f", "#3b5998", "#192f6a"]}
+          colors={props.colors}
+          start={props.start}
+          end={props.end}
           style={{
             position: "absolute",
             left: 0,
@@ -42,6 +44,7 @@ const styles = StyleSheet.create({
     width: "100%",
     borderRadius: 20,
     overflow: "hidden",
+    elevation: 5,
   },
   cardTitle: {
     fontSize: 30,
