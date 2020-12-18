@@ -32,47 +32,47 @@ const Item = ({ title, onItemClick }) => (
 class SearchItem extends Component {
   getSummary = (title) => {};
 
-  componentDidMount() {}
+  componentDidMount() {
+    console.log(this.props.Data);
+  }
 
   renderItem = ({ item }) => {
     return <Item title={item.title} onItemClick={this.getSummary} />;
   };
   render() {
     return (
-      <Container>
+      <View style={styles.SearchListContainer}>
         {/* <FlatList
           data={this.props.Data}
           renderItem={this.renderItem}
           keyExtractor={(item) => item.id}
         /> */}
 
-        <Content>
-          <List
-            style={{
-              width: width * 0.95,
-            }}
-          >
-            {this.props.Data.map((item) => {
-              return (
-                <ListItem
-                  onPress={() => {
-                    this.props.navigation.navigate("Summary", {
-                      keyword: item.title,
-                    });
-                  }}
-                >
-                  <Left>
-                    <Text>{item.title}</Text>
-                  </Left>
-                  <Right>
-                    <Icon name="arrow-forward" />
-                  </Right>
-                </ListItem>
-              );
-            })}
-          </List>
-        </Content>
-      </Container>
+        <List
+          style={{
+            width: width * 0.95,
+          }}
+        >
+          {this.props.Data.map((item) => {
+            return (
+              <ListItem
+                onPress={() => {
+                  this.props.navigation.navigate("Summary", {
+                    keyword: item.title,
+                  });
+                }}
+              >
+                <Left>
+                  <Text>{item.title}</Text>
+                </Left>
+                <Right>
+                  <Icon name="arrow-forward" />
+                </Right>
+              </ListItem>
+            );
+          })}
+        </List>
+      </View>
     );
   }
 }
@@ -81,7 +81,6 @@ const styles = StyleSheet.create({
   SearchListContainer: {
     justifyContent: "center",
     alignItems: "center",
-    flex: 1,
   },
   item: {
     backgroundColor: "#f9c2ff",

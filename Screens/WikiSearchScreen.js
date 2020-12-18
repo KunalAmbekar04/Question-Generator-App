@@ -28,7 +28,6 @@ class WikiSearchScreen extends Component {
   }
 
   keywordHandler = (word) => {
-    console.log(word);
     this.setState({
       keyword: word,
     });
@@ -38,7 +37,7 @@ class WikiSearchScreen extends Component {
     if (this.state.keyword === "") {
       Alert.alert("Enter Keyword!");
     } else {
-      fetch(`${API_URL}/search?q=${this.state.keyword}`)
+      fetch(`${API_URL}search?q=${this.state.keyword}`)
         .then((resp) => {
           return resp.json();
         })
