@@ -6,12 +6,7 @@ import Card from "../Components/Card/Card";
 class CategoriesScreen extends Component {
   render() {
     return (
-      <LinearGradient
-        colors={["#ff4b1f", "#ff9068"]}
-        style={styles.CategoryContainer}
-        start={[0, 0]}
-        end={[0, 1]}
-      >
+      <View style={styles.CategoryContainer}>
         <Card
           title="Wiki Search"
           backgroundColor="#9eecff"
@@ -32,7 +27,7 @@ class CategoriesScreen extends Component {
           end={[1, 1]}
           toScreen={() => this.props.navigation.navigate("Summary")}
         />
-      </LinearGradient>
+      </View>
     );
   }
 }

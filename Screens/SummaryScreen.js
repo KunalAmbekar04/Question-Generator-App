@@ -11,6 +11,7 @@ import {
   Body,
   Button,
   Icon,
+  Spinner,
 } from "native-base";
 import { TextInput } from "react-native-gesture-handler";
 import AwesomeAlert from "react-native-awesome-alerts";
@@ -26,6 +27,7 @@ class SummaryScreen extends Component {
       question: "",
       answer: "",
       isLoading: true,
+      loader: false,
       showAlert: false,
       title: "Answer",
     };
@@ -35,17 +37,25 @@ class SummaryScreen extends Component {
     if (this.props.route.params) {
       const keyword = this.props.route.params.keyword;
 
-      fetch(`${API_URL}summary?keyword=${keyword}`)
-        .then((resp) => resp.json())
-        .then((data) => {
-          this.setState({
-            summary: data["summary"],
-            keyword: keyword,
-          });
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+      this.setState(
+        {
+          loader: true,
+        },
+        () => {
+          fetch(`${API_URL}summary?keyword=${keyword}`)
+            .then((resp) => resp.json())
+            .then((data) => {
+              this.setState({
+                summary: data["summary"],
+                keyword: keyword,
+                loader: false,
+              });
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+        }
+      );
     }
   }
 
@@ -57,37 +67,9 @@ class SummaryScreen extends Component {
 
   generateQuestionHandler = () => {
     console.log("clicked");
-    const data = {
+    this.props.navigation.navigate("QuestionList", {
       context: this.state.summary,
-    };
-    // this.props.navigation.navigate("QuestionList", {
-    //   questions: [],
-    // });
-    fetch(`${API_URL}generate`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    })
-      .then((resp) => {
-        return resp.json();
-      })
-      .then((list) => {
-        let questions = [];
-
-        for (let key in list["questions"]) {
-          questions.push({
-            title: list["questions"][key],
-            id: key,
-            content: "",
-          });
-        }
-        this.props.navigation.navigate("QuestionList", {
-          questions: questions,
-          context: this.state.summary,
-        });
-      });
+    });
   };
 
   askQuestionHandler = () => {
@@ -155,14 +137,18 @@ class SummaryScreen extends Component {
             </CardItem>
             <CardItem>
               <Body>
-                <TextInput
-                  {...this.props}
-                  onChangeText={(text) => this.setState({ summary: text })}
-                  multiline={true}
-                  placeholder="Start typing.."
-                >
-                  {this.state.summary}
-                </TextInput>
+                {this.state.loader ? (
+                  <Spinner color="red" style={{ marginHorizontal: "43%" }} />
+                ) : (
+                  <TextInput
+                    {...this.props}
+                    onChangeText={(text) => this.setState({ summary: text })}
+                    multiline={true}
+                    placeholder="Start typing.."
+                  >
+                    {this.state.summary}
+                  </TextInput>
+                )}
               </Body>
             </CardItem>
             <CardItem footer bordered>

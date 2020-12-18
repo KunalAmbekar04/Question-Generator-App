@@ -1,4 +1,12 @@
-import { Header, Item, Icon, Input, Content, Container } from "native-base";
+import {
+  Header,
+  Item,
+  Icon,
+  Input,
+  Content,
+  Container,
+  Spinner,
+} from "native-base";
 import React, { Component } from "react";
 import {
   View,
@@ -24,6 +32,7 @@ class WikiSearchScreen extends Component {
       keyword: "",
       summary: "",
       searchList: [],
+      isLoading: false,
     };
   }
 
@@ -37,20 +46,28 @@ class WikiSearchScreen extends Component {
     if (this.state.keyword === "") {
       Alert.alert("Enter Keyword!");
     } else {
-      fetch(`${API_URL}search?q=${this.state.keyword}`)
-        .then((resp) => {
-          return resp.json();
-        })
-        .then((data) => {
-          let searchList = [];
+      this.setState(
+        {
+          isLoading: true,
+        },
+        () => {
+          fetch(`${API_URL}search?q=${this.state.keyword}`)
+            .then((resp) => {
+              return resp.json();
+            })
+            .then((data) => {
+              let searchList = [];
 
-          for (let key in data["searchList"]) {
-            searchList.push({ title: data["searchList"][key], id: key });
-          }
-          this.setState({
-            searchList: searchList,
-          });
-        });
+              for (let key in data["searchList"]) {
+                searchList.push({ title: data["searchList"][key], id: key });
+              }
+              this.setState({
+                searchList: searchList,
+                isLoading: false,
+              });
+            });
+        }
+      );
     }
   };
 
@@ -58,8 +75,8 @@ class WikiSearchScreen extends Component {
     return (
       <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
         <View style={styles.screen}>
-          <Header searchBar>
-            <Item style={{ padding: 10 }}>
+          <Header searchBar rounded>
+            <Item style={{ padding: 4 }}>
               <Icon name="ios-search" />
               <Input
                 placeholder="Search"
@@ -67,7 +84,7 @@ class WikiSearchScreen extends Component {
                 onSubmitEditing={this.searchHandler}
                 placeholder="Enter Keyword.."
               />
-              <FontAwesome name="wikipedia-w" size={24} color="black" />
+              <FontAwesome name="wikipedia-w" size={20} color="black" />
             </Item>
             {/* <Button transparent>
               <Text>Search</Text>
@@ -81,7 +98,9 @@ class WikiSearchScreen extends Component {
             />
             <Button title="Search" onPress={} />
           </View> */}
-          {this.state.searchList.length === 0 ? (
+          {this.state.isLoading ? (
+            <Spinner color="red" />
+          ) : this.state.searchList.length === 0 ? (
             <View style={{ alignItems: "center", paddingTop: 10 }}>
               <Text>Enter Valid Text</Text>
             </View>

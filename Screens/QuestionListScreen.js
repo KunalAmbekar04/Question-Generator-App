@@ -1,7 +1,14 @@
 import React, { Component } from "react";
 import { View, StyleSheet, Dimensions } from "react-native";
 import { FlatList, TouchableOpacity } from "react-native-gesture-handler";
-import { Container, Content, Text, Icon, Accordion } from "native-base";
+import {
+  Container,
+  Content,
+  Text,
+  Icon,
+  Accordion,
+  Spinner,
+} from "native-base";
 import { API_URL } from "../Utils";
 
 const { width, height } = Dimensions.get("window");
@@ -17,6 +24,7 @@ class QuestionListScreen extends Component {
     this.state = {
       questions: [],
       context: "",
+      isLoading: false,
     };
   }
   renderItem = ({ item }) => {
@@ -24,10 +32,43 @@ class QuestionListScreen extends Component {
   };
 
   componentDidMount() {
-    this.setState({
-      questions: this.props.route.params.questions,
+    const data = {
       context: this.props.route.params.context,
-    });
+    };
+
+    this.setState(
+      {
+        isLoading: true,
+        context: this.props.route.params.context,
+      },
+      () => {
+        fetch(`${API_URL}generate`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        })
+          .then((resp) => {
+            return resp.json();
+          })
+          .then((list) => {
+            let questions = [];
+
+            for (let key in list["questions"]) {
+              questions.push({
+                title: list["questions"][key],
+                id: key,
+                content: "",
+              });
+            }
+            this.setState({
+              isLoading: false,
+              questions: questions,
+            });
+          });
+      }
+    );
   }
 
   _renderHeader(item, expanded, index, that) {
@@ -106,18 +147,22 @@ class QuestionListScreen extends Component {
       <View style={styles.screen}>
         <Container>
           <Content padder>
-            <Accordion
-              dataArray={this.state.questions}
-              icon="add"
-              expandedIcon="remove"
-              style={styles.item}
-              animation={true}
-              expanded={true}
-              renderHeader={(item, expanded, index) =>
-                this._renderHeader(item, expanded, index, this)
-              }
-              renderContent={this._renderContent}
-            />
+            {this.state.isLoading ? (
+              <Spinner color="red" />
+            ) : (
+              <Accordion
+                dataArray={this.state.questions}
+                icon="add"
+                expandedIcon="remove"
+                style={styles.item}
+                animation={true}
+                expanded={true}
+                renderHeader={(item, expanded, index) =>
+                  this._renderHeader(item, expanded, index, this)
+                }
+                renderContent={this._renderContent}
+              />
+            )}
           </Content>
         </Container>
       </View>
@@ -130,6 +175,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "white",
   },
   item: {
     // backgroundColor: "#f9c2ff",
